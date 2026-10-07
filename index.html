@@ -1,245 +1,882 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>نظام التقارير العسكرية</title>
-  
-  <!-- مكتبة Tailwind CSS للتنسيق -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  
-  <!-- مكتبات React و Babel لتشغيل الكود مباشرة بالمتصفح -->
-  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-
-  <style>
-    body {
-      background-color: #090d14;
-      color: #ffffff;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    }
-  </style>
-</head>
-<body class="min-h-screen flex items-center justify-center p-4">
-
-  <!-- المكان الذي سيتم عرض الواجهة فيه -->
-  <div id="root" class="w-full"></div>
-
-  <script type="text/babel">
-    const { useState } = React;
-
-    // دالة زخرفة التقرير
-    const decorateReport = (title, text) => {
-      if (!text) return "";
-      const header = title || "تقرير عسكري رسمـي";
-      return `╭━━━❰ 🎖️ ${header} 🎖️ ❱━━━╮\n\n${text}\n\n╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯`;
-    };
-
-    function MilitaryApp() {
-      // حالة بطاقة المخالفة الصريحة
-      const [violationTitle, setViolationTitle] = useState("تقرير مخالفة صريحة");
-      const [violationText, setViolationText] = useState("");
-      const [violationAttached, setViolationAttached] = useState(false);
-
-      // حالة بطاقة التقرير العسكري
-      const [militaryTitle, setMilitaryTitle] = useState("عنوان التقرير العسكري...");
-      const [militaryText, setMilitaryText] = useState("");
-      const [militaryAttached, setMilitaryAttached] = useState(false);
-
-      // تنفيذ الزخرفة
-      const handleDecorate = (type) => {
-        if (type === "violation") {
-          setViolationText(prev => decorateReport(violationTitle, prev));
-        } else {
-          setMilitaryText(prev => decorateReport(militaryTitle, prev));
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>مركز العمليات التكتيكية | القيادة العليا</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-dark: #06090e;
+            --panel-bg: rgba(10, 16, 26, 0.95);
+            --border-cyan: rgba(0, 240, 255, 0.4);
+            --cyan: #00f0ff;
+            --gold: #ffb700;
+            --red: #ff3366;
+            --green: #00ff88;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
         }
-      };
 
-      // نسخ التقرير
-      const copyToClipboard = (text) => {
-        if (!text) return;
-        navigator.clipboard.writeText(text);
-        alert("تم نسخ التقرير بنجاح!");
-      };
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            font-family: 'Tajawal', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-      return (
-        <div className="w-full min-h-screen bg-[#090d14] text-white p-6 flex items-center justify-center relative overflow-x-auto select-none">
-          
-          {/* خلفية شبكية عسكرية */}
-          <div 
-            className="absolute inset-0 pointer-events-none opacity-20"
-            style={{
-              backgroundImage: `radial-gradient(#00f2fe 1px, transparent 1px)`,
-              backgroundSize: '24px 24px'
-            }}
-          />
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            touch-action: none;
+        }
 
-          <div className="flex items-center gap-12 relative z-10 my-auto py-8">
+        #viewport {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+            cursor: grab;
+            background-image: 
+                radial-gradient(circle at 50% 50%, rgba(0, 240, 255, 0.05) 0%, transparent 80%),
+                linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 100% 100%, 35px 35px, 35px 35px;
+        }
 
-            {/* 1. بطاقة مخالفة صريحة (اليسار) */}
-            <div className="w-[380px] bg-[#0d131d] border border-cyan-500/40 rounded-xl p-4 shadow-[0_0_20px_rgba(0,242,254,0.1)] flex flex-col gap-3 relative">
-              
-              <div className="flex items-center justify-between border-b border-gray-800 pb-2.5">
-                <span className="text-[10px] font-bold text-red-400 bg-red-950/60 px-2 py-0.5 rounded border border-red-800/50 uppercase">
-                  violation
-                </span>
-                <input
-                  type="text"
-                  value={violationTitle}
-                  onChange={(e) => setViolationTitle(e.target.value)}
-                  className="bg-transparent text-right font-bold text-sm text-cyan-300 focus:outline-none focus:border-b focus:border-cyan-400 px-1 w-full mr-2"
-                  placeholder="عنوان المخالفة..."
-                />
-                <button 
-                  onClick={() => { setViolationText(""); setViolationTitle("تقرير مخالفة صريحة"); }}
-                  className="text-gray-500 hover:text-red-400 text-xs px-1"
-                >
-                  ✕
-                </button>
-              </div>
+        #viewport:active { cursor: grabbing; }
 
-              {/* زر الزخرفة */}
-              <button
-                type="button"
-                onClick={() => handleDecorate("violation")}
-                className="flex items-center justify-center gap-2 bg-[#142232] hover:bg-[#1a2d42] border border-cyan-500/30 text-cyan-300 text-xs py-1.5 px-3 rounded-lg transition-all active:scale-95"
-              >
-                <span>✨ زخرفة عسكرية (مثل الصورة)</span>
-              </button>
+        #canvas {
+            position: absolute;
+            transform-origin: 0 0;
+            width: 10000px;
+            height: 10000px;
+            top: 0;
+            left: 0;
+            z-index: 2;
+        }
 
-              {/* ورقة الكتابة والشرح */}
-              <div className="flex flex-col gap-1">
-                <label className="text-[11px] text-gray-400 font-medium">ورقة الشرح والمجريات والأدلة:</label>
-                <textarea
-                  value={violationText}
-                  onChange={(e) => setViolationText(e.target.value)}
-                  placeholder="اكتب تفاصيل المخالفة هنا... (مساحة مفتوحة للشرح والمجريات والإثباتات)"
-                  rows={8}
-                  className="w-full bg-[#06090e] border border-gray-800 rounded-lg p-3 text-xs text-gray-200 focus:border-cyan-500 focus:outline-none resize-none leading-relaxed"
-                />
-              </div>
+        #svg-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
 
-              {/* المرفقات */}
-              <div className="bg-[#06090e] border border-dashed border-gray-800 rounded-lg py-3 px-2 flex items-center justify-center text-xs text-gray-400">
-                {violationAttached ? (
-                  <span className="text-emerald-400">✓ تم إرفاق المادة / الدليل</span>
-                ) : (
-                  <span className="text-gray-500">لم يتم إرفاق إثباتات</span>
-                )}
-              </div>
+        /* تحسين خيوط الربط التكتيكية */
+        .connection-line {
+            stroke: var(--cyan);
+            stroke-width: 3.5px;
+            fill: none;
+            stroke-dasharray: 6 4;
+            animation: dash 20s linear infinite;
+            filter: drop-shadow(0 0 6px var(--cyan));
+            pointer-events: stroke;
+            cursor: pointer;
+        }
 
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => setViolationAttached(!violationAttached)}
-                  className="flex-1 bg-[#101d2c] hover:bg-[#172a3f] border border-cyan-500/30 text-cyan-300 text-xs py-2 rounded-lg transition-all"
-                >
-                  📁 {violationAttached ? "تغيير المرفق" : "رفع / تغيير المرفق"}
-                </button>
+        .connection-line:hover {
+            stroke: var(--red);
+            stroke-width: 5px;
+            filter: drop-shadow(0 0 12px var(--red));
+        }
 
-                <button
-                  type="button"
-                  onClick={() => copyToClipboard(violationText)}
-                  className="bg-[#101d2c] hover:bg-[#172a3f] border border-cyan-500/30 text-cyan-300 px-3 text-xs rounded-lg transition-all"
-                >
-                  📋
-                </button>
-              </div>
+        @keyframes dash {
+            to { stroke-dashoffset: -100; }
+        }
 
-              {/* نقطة الربط */}
-              <div className="absolute -right-3 top-1/2 -translate-y-1/2 w-5 h-5 bg-cyan-400 rounded-full border-4 border-[#090d14] shadow-[0_0_12px_#00f2fe]" />
+        .header {
+            position: fixed;
+            top: 12px;
+            left: 12px;
+            right: 12px;
+            height: 60px;
+            background: var(--panel-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border-cyan);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 15px;
+            z-index: 1000;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8), inset 0 0 15px rgba(0, 240, 255, 0.1);
+        }
+
+        .logo-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            font-size: 24px;
+            color: var(--cyan);
+            filter: drop-shadow(0 0 10px var(--cyan));
+        }
+
+        .title-text h1 {
+            font-size: 15px;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: 0.5px;
+        }
+
+        .title-text p {
+            font-size: 10px;
+            color: var(--cyan);
+            font-weight: 600;
+        }
+
+        .controls-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn {
+            background: rgba(0, 240, 255, 0.1);
+            border: 1px solid var(--cyan);
+            color: var(--cyan);
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover, .btn:active {
+            background: var(--cyan);
+            color: #000;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.5);
+        }
+
+        .btn-gold {
+            background: rgba(255, 183, 0, 0.12);
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        .btn-gold:hover, .btn-gold:active {
+            background: var(--gold);
+            color: #000;
+            box-shadow: 0 0 15px rgba(255, 183, 0, 0.5);
+        }
+
+        .btn-danger {
+            background: rgba(255, 51, 102, 0.12);
+            border-color: var(--red);
+            color: var(--red);
+        }
+
+        .btn-danger:hover, .btn-danger:active {
+            background: var(--red);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(255, 51, 102, 0.5);
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .status-admin {
+            background: rgba(0, 255, 136, 0.15);
+            color: var(--green);
+            border: 1px solid var(--green);
+            box-shadow: 0 0 10px rgba(0,255,136,0.2);
+        }
+
+        .status-viewer {
+            background: rgba(0, 240, 255, 0.15);
+            color: var(--cyan);
+            border: 1px solid var(--cyan);
+        }
+
+        .card {
+            position: absolute;
+            width: 440px;
+            height: 440px;
+            min-width: 320px;
+            min-height: 280px;
+            background: var(--panel-bg);
+            border: 1px solid var(--border-cyan);
+            border-radius: 12px;
+            padding: 12px;
+            z-index: 10;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.7), inset 0 0 10px rgba(0,240,255,0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            touch-action: none;
+            resize: both;
+            overflow: hidden;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 8px;
+            cursor: move;
+        }
+
+        .card-title-input {
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-weight: 800;
+            font-size: 14px;
+            width: 70%;
+            outline: none;
+            user-select: text;
+        }
+
+        .card-type-tag {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+
+        .card-body {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .card-textarea {
+            width: 100%;
+            height: 120px;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            border-radius: 8px;
+            padding: 10px;
+            color: var(--text-main);
+            font-size: 13px;
+            line-height: 1.6;
+            resize: vertical;
+            outline: none;
+            user-select: text;
+            word-break: break-word;
+        }
+
+        .card-textarea:focus {
+            border-color: var(--cyan);
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.25);
+        }
+
+        /* بطاقة السرد الميداني الكامل */
+        .card-report-only {
+            background: linear-gradient(135deg, rgba(0, 240, 255, 0.08) 0%, rgba(10, 16, 26, 0.98) 100%);
+            border: 1px solid var(--cyan) !important;
+            box-shadow: 0 0 25px rgba(0, 240, 255, 0.15) !important;
+        }
+
+        .card-report-only .card-textarea {
+            height: 100% !important;
+            flex: 1;
+            resize: none;
+            font-size: 14px;
+        }
+
+        .media-container {
+            flex: 1;
+            width: 100%;
+            min-height: 100px;
+            background-color: #000;
+            border: 1px solid rgba(0, 240, 255, 0.25);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .media-element {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: #000;
+        }
+
+        .node {
+            width: 18px;
+            height: 18px;
+            background: var(--cyan);
+            border: 2px solid #000;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            box-shadow: 0 0 10px var(--cyan);
+            z-index: 30;
+        }
+
+        .node-active {
+            background: var(--gold) !important;
+            box-shadow: 0 0 20px var(--gold) !important;
+            animation: pulseNode 0.6s infinite alternate;
+        }
+
+        @keyframes pulseNode {
+            0% { scale: 1; }
+            100% { scale: 1.35; }
+        }
+
+        .node-left { left: -9px; }
+        .node-right { right: -9px; }
+
+        .card-exception {
+            background: linear-gradient(135deg, rgba(255, 183, 0, 0.15) 0%, rgba(10, 16, 26, 0.95) 100%);
+            border: 2px solid var(--gold) !important;
+            box-shadow: 0 0 30px rgba(255, 183, 0, 0.3) !important;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .modal-box {
+            background: var(--panel-bg);
+            border: 1px solid var(--cyan);
+            padding: 25px;
+            border-radius: 16px;
+            width: 320px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            box-shadow: 0 0 30px rgba(0,240,255,0.25);
+            text-align: center;
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 10px;
+            background: rgba(0,0,0,0.6);
+            border: 1px solid var(--border-cyan);
+            border-radius: 8px;
+            color: #fff;
+            outline: none;
+            text-align: center;
+            font-size: 16px;
+            user-select: text;
+        }
+
+        .bottom-toolbar {
+            position: fixed;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--panel-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border-cyan);
+            padding: 8px 16px;
+            border-radius: 30px;
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            max-width: 95vw;
+            overflow-x: auto;
+        }
+
+        @media (max-width: 768px) {
+            .header { padding: 0 10px; }
+            .title-text h1 { font-size: 12px; }
+            .title-text p { font-size: 9px; }
+            .card { width: 320px; height: 350px; }
+            .bottom-toolbar { bottom: 10px; padding: 6px 10px; }
+            .btn { font-size: 11px; padding: 6px 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="logo-group">
+            <i class="fa-solid fa-shield-halved logo-icon"></i>
+            <div class="title-text">
+                <h1>مركز العمليات التكتيكية</h1>
+                <p>إدارة القيادة العليا | النظام الموحد</p>
             </div>
-
-
-            {/* خط الربط */}
-            <div className="w-28 h-[2px] bg-gradient-to-r from-cyan-500/40 via-cyan-400 to-yellow-500/40 relative flex items-center justify-center">
-              <div className="w-2.5 h-2.5 bg-cyan-400 rounded-full shadow-[0_0_8px_#00f2fe] animate-pulse" />
-            </div>
-
-
-            {/* 2. بطاقة التقرير العسكري الرئيسي (اليمين) */}
-            <div className="w-[400px] bg-[#0d131d] border-2 border-yellow-500/60 rounded-xl p-4 shadow-[0_0_25px_rgba(234,179,8,0.12)] flex flex-col gap-3 relative">
-              
-              <div className="flex items-center justify-between border-b border-gray-800 pb-2.5">
-                <span className="text-[10px] font-bold text-cyan-400 bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-800/50 uppercase">
-                  military
-                </span>
-                <input
-                  type="text"
-                  value={militaryTitle}
-                  onChange={(e) => setMilitaryTitle(e.target.value)}
-                  className="bg-transparent text-right font-bold text-sm text-yellow-400 focus:outline-none focus:border-b focus:border-yellow-400 px-1 w-full mr-2"
-                  placeholder="عنوان التقرير..."
-                />
-                <button 
-                  onClick={() => { setMilitaryText(""); setMilitaryTitle("عنوان التقرير العسكري..."); }}
-                  className="text-gray-500 hover:text-red-400 text-xs px-1"
-                >
-                  ✕
-                </button>
-              </div>
-
-              {/* زر الزخرفة */}
-              <button
-                type="button"
-                onClick={() => handleDecorate("military")}
-                className="flex items-center justify-center gap-2 bg-[#1a1e28] hover:bg-[#252b3a] border border-yellow-500/40 text-yellow-400 text-xs py-1.5 px-3 rounded-lg transition-all active:scale-95"
-              >
-                <span>✨ زخرفة عسكرية (مثل الصورة)</span>
-              </button>
-
-              {/* ورقة الشرح الكامل والمجريات */}
-              <div className="flex flex-col gap-1">
-                <label className="text-[11px] text-gray-400 font-medium">ورقة الشرح الكامل والمجريات والإثباتات:</label>
-                <textarea
-                  value={militaryText}
-                  onChange={(e) => setMilitaryText(e.target.value)}
-                  placeholder="اكتب تفاصيل التقرير العسكري هنا... (ورقة فاضية لشرح الحالة بالكامل مع إمكانية إضافة المجريات والأدلة والإثباتات بالأسفل)"
-                  rows={9}
-                  className="w-full bg-[#06090e] border border-gray-800 rounded-lg p-3 text-xs text-gray-200 focus:border-yellow-500 focus:outline-none resize-none leading-relaxed"
-                />
-              </div>
-
-              {/* المرفقات */}
-              <div className="bg-[#06090e] border border-dashed border-gray-800 rounded-lg py-3 px-2 flex items-center justify-center text-xs text-gray-400">
-                {militaryAttached ? (
-                  <span className="text-emerald-400">✓ تم إرفاق الملف العسكري</span>
-                ) : (
-                  <span className="text-gray-500">لم يتم إرفاق إثباتات</span>
-                )}
-              </div>
-
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => setMilitaryAttached(!militaryAttached)}
-                  className="flex-1 bg-[#181d28] hover:bg-[#222938] border border-yellow-500/30 text-yellow-400 text-xs py-2 rounded-lg transition-all"
-                >
-                  📁 {militaryAttached ? "تغيير المرفق" : "رفع / تغيير المرفق"}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => copyToClipboard(militaryText)}
-                  className="bg-[#181d28] hover:bg-[#222938] border border-yellow-500/30 text-yellow-400 px-3 text-xs rounded-lg transition-all"
-                >
-                  📋
-                </button>
-              </div>
-
-              {/* نقطة الربط */}
-              <div className="absolute -left-3 top-1/2 -translate-y-1/2 w-5 h-5 bg-cyan-400 rounded-full border-4 border-[#090d14] shadow-[0_0_12px_#00f2fe]" />
-            </div>
-
-          </div>
         </div>
-      );
-    }
 
-    // تشغيل التطبيق في الصفحة
-    const root = ReactDOM.createRoot(document.getElementById("root"));
-    root.render(<MilitaryApp />);
-  </script>
+        <div class="controls-group">
+            <div id="statusBadge" class="status-badge status-viewer">
+                <i class="fa-solid fa-eye"></i> معاينة مباشرة
+            </div>
+            <button class="btn" onclick="copyShareLink()">
+                <i class="fa-solid fa-share-nodes"></i> الرابط
+            </button>
+            <button id="authBtn" class="btn btn-gold" onclick="openAuthModal()">
+                <i class="fa-solid fa-key"></i> القائد
+            </button>
+        </div>
+    </header>
+
+    <div id="viewport">
+        <div id="canvas">
+            <svg id="svg-layer"></svg>
+        </div>
+    </div>
+
+    <input type="file" id="localFileInput" accept="image/*,video/*" style="display: none;" onchange="handleFileSelected(event)">
+
+    <div class="bottom-toolbar" id="commanderToolbar" style="display: none;">
+        <button class="btn btn-gold" onclick="addCard('report')"><i class="fa-solid fa-scroll"></i> سرد ميداني / تقرير</button>
+        <button class="btn" onclick="addCard('duty')"><i class="fa-solid fa-user-shield"></i> فترة</button>
+        <button class="btn" onclick="addCard('violation')"><i class="fa-solid fa-gavel"></i> مخالفة</button>
+        <button class="btn" onclick="addCard('evidence')"><i class="fa-solid fa-file-video"></i> إثبات</button>
+        <button class="btn" onclick="addCard('success')"><i class="fa-solid fa-trophy"></i> نجاح</button>
+        <button class="btn btn-gold" onclick="addCard('exception')"><i class="fa-solid fa-crown"></i> استثنائي</button>
+        <button class="btn btn-danger" onclick="clearCanvas()"><i class="fa-solid fa-trash"></i> مسح</button>
+    </div>
+
+    <div class="modal-overlay" id="authModal">
+        <div class="modal-box">
+            <h2 style="color: var(--gold); font-size: 16px;"><i class="fa-solid fa-lock"></i> دخول القائد</h2>
+            <p style="font-size: 11px; color: var(--text-muted);">أدخل الرمز السري للتفعيل</p>
+            <input type="password" id="passInput" class="modal-input" placeholder="الرمز السري">
+            <button class="btn btn-gold" style="width: 100%; justify-content: center;" onclick="verifyCommander()">تأكيد</button>
+            <button class="btn btn-danger" style="width: 100%; justify-content: center;" onclick="closeAuthModal()">إلغاء</button>
+        </div>
+    </div>
+
+    <script>
+        const syncChannel = new BroadcastChannel('tactical_ops_sync');
+        let db;
+        const request = indexedDB.open("TacticalOpsDB", 1);
+        request.onupgradeneeded = function(e) {
+            db = e.target.result;
+            if (!db.objectStoreNames.contains("mediaStore")) {
+                db.createObjectStore("mediaStore");
+            }
+        };
+        request.onsuccess = function(e) {
+            db = e.target.result;
+            renderBoard();
+        };
+
+        let isCommander = false;
+        let scale = 1, panX = 0, panY = 0;
+        let isPanning = false, startX, startY;
+        let cards = [], connections = [];
+        let activeNodeData = null;
+        let currentTargetCardId = null;
+
+        const viewport = document.getElementById('viewport');
+        const canvas = document.getElementById('canvas');
+        const svgLayer = document.getElementById('svg-layer');
+
+        if (localStorage.getItem('commander_authenticated') === 'true') {
+            enableCommanderMode();
+        }
+
+        function getPointerPos(e) {
+            return e.touches ? { x: e.touches[0].clientX, y: e.touches[0].clientY } : { x: e.clientX, y: e.clientY };
+        }
+
+        function handlePointerDown(e) {
+            if (e.target === viewport || e.target === canvas || e.target === svgLayer) {
+                isPanning = true;
+                const pos = getPointerPos(e);
+                startX = pos.x - panX;
+                startY = pos.y - panY;
+            }
+        }
+
+        function handlePointerMove(e) {
+            if (isPanning) {
+                const pos = getPointerPos(e);
+                panX = pos.x - startX;
+                panY = pos.y - startY;
+                updateTransform();
+            }
+        }
+
+        function handlePointerEnd() { isPanning = false; }
+
+        viewport.addEventListener('mousedown', handlePointerDown);
+        window.addEventListener('mousemove', handlePointerMove);
+        window.addEventListener('mouseup', handlePointerEnd);
+
+        viewport.addEventListener('touchstart', handlePointerDown, { passive: false });
+        window.addEventListener('touchmove', handlePointerMove, { passive: false });
+        window.addEventListener('touchend', handlePointerEnd);
+
+        viewport.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const zoomFactor = 0.05;
+            if (e.deltaY < 0) scale = Math.min(scale + zoomFactor, 2);
+            else scale = Math.max(scale - zoomFactor, 0.4);
+            updateTransform();
+        }, { passive: false });
+
+        function updateTransform() {
+            canvas.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+        }
+
+        function openAuthModal() { document.getElementById('authModal').style.display = 'flex'; }
+        function closeAuthModal() { document.getElementById('authModal').style.display = 'none'; }
+
+        function verifyCommander() {
+            const pass = document.getElementById('passInput').value;
+            if (pass === '7777' || pass === 'kw77') {
+                localStorage.setItem('commander_authenticated', 'true');
+                enableCommanderMode();
+                closeAuthModal();
+            } else {
+                alert('الرمز السري غير صحيح!');
+            }
+        }
+
+        function enableCommanderMode() {
+            isCommander = true;
+            document.getElementById('statusBadge').className = 'status-badge status-admin';
+            document.getElementById('statusBadge').innerHTML = '<i class="fa-solid fa-user-check"></i> القائد (وضع التحكم)';
+            document.getElementById('commanderToolbar').style.display = 'flex';
+            document.getElementById('authBtn').style.display = 'none';
+            renderBoard();
+        }
+
+        function addCard(type, data = null) {
+            if (!isCommander && !data) return;
+
+            const cardId = data ? data.id : 'card_' + Date.now();
+            const cardObj = data || {
+                id: cardId,
+                type: type,
+                title: getDefaultTitle(type),
+                text: '',
+                hasMedia: false,
+                x: Math.abs(panX) + 50 + (cards.length * 20),
+                y: Math.abs(panY) + 80 + (cards.length * 20),
+                width: type === 'report' ? 480 : (window.innerWidth < 768 ? 320 : 440),
+                height: type === 'report' ? 480 : 440
+            };
+
+            if (!data) cards.push(cardObj);
+            renderCard(cardObj);
+            saveState();
+        }
+
+        function getDefaultTitle(type) {
+            switch(type) {
+                case 'report': return 'سرد مجريات / تقرير ميداني';
+                case 'duty': return 'استلام فترة / مسؤولية';
+                case 'violation': return 'تقرير مخالفة صريحة';
+                case 'evidence': return 'إثبات تكتيكي (فيديو/صورة)';
+                case 'success': return 'حالة قيادية ناجحة';
+                case 'exception': return '⚠️ أمر قيادي استثنائي';
+                default: return 'بطاقة تكتيكية';
+            }
+        }
+
+        function renderCard(card) {
+            let el = document.getElementById(card.id);
+            if (!el) {
+                el = document.createElement('div');
+                canvas.appendChild(el);
+            }
+            
+            const isReportOnly = card.type === 'report';
+            el.className = `card ${card.type === 'exception' ? 'card-exception' : ''} ${isReportOnly ? 'card-report-only' : ''}`;
+            el.id = card.id;
+            el.style.left = card.x + 'px';
+            el.style.top = card.y + 'px';
+            el.style.width = (card.width || 440) + 'px';
+            el.style.height = (card.height || 440) + 'px';
+
+            let bodyContent = '';
+            if (isReportOnly) {
+                bodyContent = `
+                    <textarea class="card-textarea" placeholder="اكتب السرد الكامل والتفاصيل الميدانية هنا بالكامل..." ${!isCommander ? 'readonly' : ''} oninput="updateCardText('${card.id}', this.value)">${card.text}</textarea>
+                `;
+            } else {
+                bodyContent = `
+                    <textarea class="card-textarea" placeholder="اكتب التقرير أو التفاصيل..." ${!isCommander ? 'readonly' : ''} oninput="updateCardText('${card.id}', this.value)">${card.text}</textarea>
+                    <div class="media-container" id="media_container_${card.id}">
+                        <span style="color:var(--text-muted); font-size:11px;">لم يتم إرفاق إثبات</span>
+                    </div>
+                    ${isCommander ? `<button class="btn" style="font-size:11px; padding:6px; justify-content:center;" onclick="triggerDirectUpload('${card.id}')"><i class="fa-solid fa-upload"></i> رفع / تغيير الإثبات</button>` : ''}
+                `;
+            }
+
+            el.innerHTML = `
+                <div class="card-header">
+                    <input type="text" class="card-title-input" value="${card.title}" ${!isCommander ? 'readonly' : ''} onchange="updateCardTitle('${card.id}', this.value)">
+                    <span class="card-type-tag" style="background: rgba(0,240,255,0.2); color: var(--cyan);">${card.type}</span>
+                    ${isCommander ? `<i class="fa-solid fa-xmark" style="cursor:pointer; color:var(--red);" onclick="deleteCard('${card.id}')"></i>` : ''}
+                </div>
+                <div class="card-body">
+                    ${bodyContent}
+                </div>
+                <div class="node node-left" onclick="handleNodeClick(event, '${card.id}', 'left')"></div>
+                <div class="node node-right" onclick="handleNodeClick(event, '${card.id}', 'right')"></div>
+            `;
+
+            makeCardDraggable(el, card);
+            observeResize(el, card);
+            if (!isReportOnly) loadMediaFromDB(card.id);
+        }
+
+        function observeResize(el, card) {
+            const observer = new ResizeObserver(entries => {
+                for (let entry of entries) {
+                    card.width = entry.contentRect.width;
+                    card.height = entry.contentRect.height;
+                    drawConnections();
+                }
+            });
+            observer.observe(el);
+        }
+
+        function handleNodeClick(e, cardId, side) {
+            e.stopPropagation();
+            if (!isCommander) return;
+
+            const nodeEl = e.currentTarget;
+
+            if (!activeNodeData) {
+                activeNodeData = { cardId, side, el: nodeEl };
+                nodeEl.classList.add('node-active');
+            } else {
+                if (activeNodeData.cardId !== cardId) {
+                    connections.push({
+                        from: activeNodeData.cardId,
+                        fromSide: activeNodeData.side,
+                        to: cardId,
+                        toSide: side
+                    });
+                    drawConnections();
+                    saveState();
+                }
+                activeNodeData.el.classList.remove('node-active');
+                activeNodeData = null;
+            }
+        }
+
+        function triggerDirectUpload(cardId) {
+            currentTargetCardId = cardId;
+            document.getElementById('localFileInput').click();
+        }
+
+        function handleFileSelected(event) {
+            const file = event.target.files[0];
+            if (!file || !currentTargetCardId) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const mediaData = e.target.result;
+                saveMediaToDB(currentTargetCardId, mediaData);
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function saveMediaToDB(cardId, data) {
+            if (!db) return;
+            const tx = db.transaction("mediaStore", "readwrite");
+            const store = tx.objectStore("mediaStore");
+            store.put(data, cardId);
+            tx.oncomplete = function() {
+                const c = cards.find(x => x.id === cardId);
+                if (c) { c.hasMedia = true; saveState(); }
+                loadMediaFromDB(cardId);
+            };
+        }
+
+        function loadMediaFromDB(cardId) {
+            if (!db) return;
+            const tx = db.transaction("mediaStore", "readonly");
+            const store = tx.objectStore("mediaStore");
+            const req = store.get(cardId);
+            req.onsuccess = function() {
+                const container = document.getElementById(`media_container_${cardId}`);
+                if (req.result && container) {
+                    const isVideo = req.result.startsWith('data:video') || req.result.endsWith('.mp4');
+                    container.innerHTML = isVideo ? `<video src="${req.result}" class="media-element" controls></video>` : `<img src="${req.result}" class="media-element">`;
+                }
+            };
+        }
+
+        function makeCardDraggable(el, card) {
+            const header = el.querySelector('.card-header');
+            let isDragging = false, offX, offY;
+
+            function startDrag(e) {
+                if (!isCommander) return;
+                isDragging = true;
+                const pos = getPointerPos(e);
+                offX = (pos.x / scale) - card.x;
+                offY = (pos.y / scale) - card.y;
+                e.stopPropagation();
+            }
+
+            function moveDrag(e) {
+                if (isDragging) {
+                    const pos = getPointerPos(e);
+                    card.x = (pos.x / scale) - offX;
+                    card.y = (pos.y / scale) - offY;
+                    el.style.left = card.x + 'px';
+                    el.style.top = card.y + 'px';
+                    drawConnections();
+                }
+            }
+
+            function endDrag() {
+                if (isDragging) {
+                    isDragging = false;
+                    saveState();
+                }
+            }
+
+            header.addEventListener('mousedown', startDrag);
+            window.addEventListener('mousemove', moveDrag);
+            window.addEventListener('mouseup', endDrag);
+
+            header.addEventListener('touchstart', startDrag, { passive: false });
+            window.addEventListener('touchmove', moveDrag, { passive: false });
+            window.addEventListener('touchend', endDrag);
+        }
+
+        function drawConnections() {
+            svgLayer.innerHTML = '';
+            connections.forEach((conn, index) => {
+                const c1 = cards.find(c => c.id === conn.from);
+                const c2 = cards.find(c => c.id === conn.to);
+                
+                if (c1 && c2) {
+                    const card1El = document.getElementById(c1.id);
+                    const card2El = document.getElementById(c2.id);
+
+                    if (!card1El || !card2El) return;
+
+                    const h1 = card1El.offsetHeight;
+                    const h2 = card2El.offsetHeight;
+
+                    const x1 = conn.fromSide === 'left' ? c1.x : c1.x + card1El.offsetWidth;
+                    const y1 = c1.y + (h1 / 2);
+
+                    const x2 = conn.toSide === 'left' ? c2.x : c2.x + card2El.offsetWidth;
+                    const y2 = c2.y + (h2 / 2);
+
+                    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    const dx = Math.abs(x2 - x1) / 2 || 60;
+                    path.setAttribute('d', `M ${x1} ${y1} C ${x1 + (conn.fromSide === 'left' ? -dx : dx)} ${y1}, ${x2 + (conn.toSide === 'left' ? -dx : dx)} ${y2}, ${x2} ${y2}`);
+                    path.setAttribute('class', 'connection-line');
+
+                    if (isCommander) {
+                        path.onclick = (e) => {
+                            e.stopPropagation();
+                            connections.splice(index, 1);
+                            drawConnections();
+                            saveState();
+                        };
+                    }
+                    svgLayer.appendChild(path);
+                }
+            });
+        }
+
+        function updateCardTitle(id, val) { const c = cards.find(x => x.id === id); if(c){ c.title = val; saveState(); } }
+        function updateCardText(id, val) { const c = cards.find(x => x.id === id); if(c){ c.text = val; saveState(); } }
+
+        function deleteCard(id) {
+            cards = cards.filter(c => c.id !== id);
+            connections = connections.filter(cn => cn.from !== id && cn.to !== id);
+            document.getElementById(id)?.remove();
+            if (db) {
+                const tx = db.transaction("mediaStore", "readwrite");
+                tx.objectStore("mediaStore").delete(id);
+            }
+            drawConnections();
+            saveState();
+        }
+
+        function clearCanvas() {
+            if (confirm('هل أنت تأكد من مسح جميع البطاقات والروابط؟')) {
+                cards = [];
+                connections = [];
+                document.querySelectorAll('.card').forEach(el => el.remove());
+                if (db) {
+                    const tx = db.transaction("mediaStore", "readwrite");
+                    tx.objectStore("mediaStore").clear();
+                }
+                drawConnections();
+                saveState();
+            }
+        }
+
+        function copyShareLink() {
+            const dataToEncode = { c: cards, n: connections };
+            const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(dataToEncode))));
+            const fullUrl = window.location.origin + window.location.pathname + '#' + encoded;
+            navigator.clipboard.writeText(fullUrl);
+            alert('تم نسخ الرابط الفوري المباشر!');
+        }
+
+        function saveState() {
+            localStorage.setItem('outlaw_tactical_cards', JSON.stringify(cards));
+            localStorage.setItem('outlaw_tactical_conns', JSON.stringify(connections));
+            syncChannel.postMessage('sync');
+        }
+
+        syncChannel.onmessage = function() {
+            renderBoard();
+        };
+
+        function renderBoard() {
+            document.querySelectorAll('.card').forEach(el => el.remove());
+            
+            if (window.location.hash.length > 5) {
+                try {
+                    const decoded = JSON.parse(decodeURIComponent(escape(atob(window.location.hash.substring(1)))));
+                    if (decoded.c) cards = decoded.c;
+                    if (decoded.n) connections = decoded.n;
+                } catch(e){}
+            } else {
+                const savedCards = localStorage.getItem('outlaw_tactical_cards');
+                const savedConns = localStorage.getItem('outlaw_tactical_conns');
+                if (savedCards) cards = JSON.parse(savedCards);
+                if (savedConns) connections = JSON.parse(savedConns);
+            }
+
+            cards.forEach(c => renderCard(c));
+            drawConnections();
+        }
+    </script>
 </body>
 </html>
