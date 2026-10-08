@@ -55,8 +55,8 @@
         #canvas {
             position: absolute;
             transform-origin: 0 0;
-            width: 10000px;
-            height: 10000px;
+            width: 1px;
+            height: 1px;
             top: 0;
             left: 0;
             z-index: 2;
@@ -70,9 +70,9 @@
             height: 100%;
             pointer-events: none;
             z-index: 1;
+            overflow: visible;
         }
 
-        /* تحسين خيوط الربط التكتيكية */
         .connection-line {
             stroke: var(--cyan);
             stroke-width: 3.5px;
@@ -289,7 +289,6 @@
             box-shadow: 0 0 10px rgba(0, 240, 255, 0.25);
         }
 
-        /* بطاقة السرد الميداني الكامل */
         .card-report-only {
             background: linear-gradient(135deg, rgba(0, 240, 255, 0.08) 0%, rgba(10, 16, 26, 0.98) 100%);
             border: 1px solid var(--cyan) !important;
@@ -774,6 +773,20 @@
 
         function drawConnections() {
             svgLayer.innerHTML = '';
+
+            let maxRight = 2000;
+            let maxBottom = 2000;
+            cards.forEach(c => {
+                const cEl = document.getElementById(c.id);
+                const w = cEl ? cEl.offsetWidth : (c.width || 440);
+                const h = cEl ? cEl.offsetHeight : (c.height || 440);
+                if (c.x + w + 1000 > maxRight) maxRight = c.x + w + 1000;
+                if (c.y + h + 1000 > maxBottom) maxBottom = c.y + h + 1000;
+            });
+
+            svgLayer.style.width = maxRight + 'px';
+            svgLayer.style.height = maxBottom + 'px';
+
             connections.forEach((conn, index) => {
                 const c1 = cards.find(c => c.id === conn.from);
                 const c2 = cards.find(c => c.id === conn.to);
