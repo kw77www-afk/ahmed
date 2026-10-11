@@ -118,7 +118,7 @@
             to { stroke-dashoffset: -100; }
         }
 
-        /* شريط HUD العلوي المطور بالكامل برؤية فخمة ومريحة للعين */
+        /* شريط HUD العلوي المطور */
         .header-hud {
             position: fixed;
             top: 16px;
@@ -136,6 +136,7 @@
             padding: 0 24px;
             z-index: 1000;
             box-shadow: 0 10px 40px rgba(0,0,0,0.9), inset 0 0 20px rgba(0, 240, 255, 0.15);
+            transition: all 0.3s ease;
         }
 
         .logo-group {
@@ -253,7 +254,7 @@
             border: 1px solid var(--cyan);
         }
 
-        /* البطاقات التكتيكية - زجاجية وشفافة بتوهج نيون حاد */
+        /* البطاقات التكتيكية العامّة */
         .card {
             position: absolute;
             width: 440px;
@@ -335,17 +336,37 @@
             box-shadow: 0 0 12px rgba(0, 240, 255, 0.3);
         }
 
+        /* تطوير بطاقة السرد الميداني بشكل فريد واستثنائي للخط والتوضيح */
         .card-report-only {
-            background: linear-gradient(135deg, rgba(0, 240, 255, 0.08) 0%, rgba(5, 12, 22, 0.98) 100%);
-            border: 1.5px solid var(--cyan) !important;
-            box-shadow: 0 0 30px rgba(0, 240, 255, 0.25) !important;
+            background: linear-gradient(135deg, rgba(0, 240, 255, 0.12) 0%, rgba(3, 8, 16, 0.98) 100%);
+            border: 2px solid var(--gold) !important;
+            box-shadow: 0 0 35px rgba(255, 183, 0, 0.3) !important;
+        }
+
+        .card-report-only .card-title-input {
+            color: var(--gold) !important;
+            font-size: 16px !important;
+            font-weight: 900 !important;
+        }
+
+        .card-report-only .card-type-tag {
+            background: rgba(255, 183, 0, 0.2) !important;
+            color: var(--gold) !important;
+            border-color: var(--gold) !important;
         }
 
         .card-report-only .card-textarea {
             height: 100% !important;
             flex: 1;
             resize: none;
-            font-size: 14px;
+            font-size: 16px !important;
+            font-weight: 700 !important;
+            line-height: 1.9 !important;
+            color: #ffffff !important;
+            background: rgba(0, 0, 0, 0.75) !important;
+            border: 1px solid rgba(255, 183, 0, 0.4) !important;
+            padding: 14px !important;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
         }
 
         .media-container {
@@ -390,6 +411,7 @@
             cursor: pointer;
             box-shadow: 0 0 12px var(--cyan);
             z-index: 30;
+            transition: opacity 0.2s;
         }
 
         .node-active {
@@ -485,7 +507,7 @@
             user-select: text;
         }
 
-        /* شريط الأدوات السفلي المطور بالكامل */
+        /* شريط الأدوات السفلي */
         .bottom-toolbar {
             position: fixed;
             bottom: 20px;
@@ -502,6 +524,48 @@
             box-shadow: 0 10px 40px rgba(0,0,0,0.95), inset 0 0 15px rgba(0, 240, 255, 0.15);
             max-width: 95vw;
             overflow-x: auto;
+            transition: all 0.3s ease;
+        }
+
+        /* زر العودة الذكي المخصص للوضع السينمائي والصورة الصافية */
+        .exit-cinematic-btn {
+            position: fixed;
+            top: 16px;
+            left: 16px;
+            z-index: 2000;
+            display: none;
+            background: rgba(0, 240, 255, 0.2);
+            border: 1.5px solid var(--cyan);
+            color: var(--cyan);
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
+            transition: all 0.2s ease;
+        }
+
+        .exit-cinematic-btn:hover {
+            background: var(--cyan);
+            color: #000;
+            box-shadow: 0 0 25px var(--cyan);
+        }
+
+        /* الوضع السينمائي لإصدار صورة صافية كلياً */
+        body.cinematic-mode .header-hud,
+        body.cinematic-mode .bottom-toolbar,
+        body.cinematic-mode .node,
+        body.cinematic-mode .card-header i,
+        body.cinematic-mode .card-body button {
+            display: none !important;
+        }
+
+        body.cinematic-mode .exit-cinematic-btn {
+            display: flex !important;
+            align-items: center;
+            gap: 6px;
         }
 
         @media (max-width: 768px) {
@@ -520,7 +584,12 @@
     <!-- شعار OUTLAW RP النيون الضخم المضيء في خلفية الصفحة -->
     <img src="https://i.ibb.co/6y4G1vX/banner.png" class="outlaw-center-banner" alt="Outlaw RP Banner" id="outlawBannerImg" onerror="this.src='https://raw.githubusercontent.com/tobi/fivem-docs/main/banner.png';">
 
-    <header class="header-hud">
+    <!-- زر الاستعادة العائم المخصص للوضع السينمائي الصافي -->
+    <button class="exit-cinematic-btn" id="exitCinematicBtn" onclick="toggleCinematicMode()">
+        <i class="fa-solid fa-eye"></i> إظهار الواجهة
+    </button>
+
+    <header class="header-hud" id="mainHeaderHud">
         <div class="logo-group">
             <div class="logo-icon-box">
                 <i class="fa-solid fa-shield-halved"></i>
@@ -535,6 +604,9 @@
             <div id="statusBadge" class="status-badge status-viewer">
                 <i class="fa-solid fa-eye"></i> معاينة مباشرة
             </div>
+            <button class="btn-hud btn-gold" onclick="toggleCinematicMode()" title="اخفاء الواجهة للالتقاط وصنع صورة صافية">
+                <i class="fa-solid fa-expand"></i> وضع التصوير (اخفاء UI)
+            </button>
             <button class="btn-hud" onclick="copyShareLink()">
                 <i class="fa-solid fa-share-nodes"></i> الرابط
             </button>
@@ -607,6 +679,10 @@
 
         if (localStorage.getItem('commander_authenticated') === 'true') {
             enableCommanderMode();
+        }
+
+        function toggleCinematicMode() {
+            document.body.classList.toggle('cinematic-mode');
         }
 
         function getPointerPos(e) {
