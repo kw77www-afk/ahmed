@@ -38,7 +38,6 @@
             touch-action: none;
         }
 
-        /* خلفية غرفة العمليات التكتيكية الفاخرة */
         #viewport {
             width: 100vw;
             height: 100vh;
@@ -54,7 +53,6 @@
             background-size: 100% 100%, 100% 4px, 40px 40px, 40px 40px;
         }
 
-        /* شعار OUTLAW RP السينمائي الكبير الثابت بالمنتصف */
         .outlaw-center-banner {
             position: fixed;
             top: 50%;
@@ -118,7 +116,6 @@
             to { stroke-dashoffset: -100; }
         }
 
-        /* شريط HUD العلوي المطور */
         .header-hud {
             position: fixed;
             top: 16px;
@@ -254,7 +251,6 @@
             border: 1px solid var(--cyan);
         }
 
-        /* البطاقات التكتيكية العامّة */
         .card {
             position: absolute;
             width: 440px;
@@ -336,7 +332,6 @@
             box-shadow: 0 0 12px rgba(0, 240, 255, 0.3);
         }
 
-        /* تطوير بطاقة السرد الميداني بشكل فريد واستثنائي للخط والتوضيح */
         .card-report-only {
             background: linear-gradient(135deg, rgba(0, 240, 255, 0.12) 0%, rgba(3, 8, 16, 0.98) 100%);
             border: 2px solid var(--gold) !important;
@@ -434,7 +429,6 @@
             box-shadow: 0 0 35px rgba(255, 183, 0, 0.35) !important;
         }
 
-        /* نافذة معاينة الصور المكبرة */
         .lightbox-modal {
             position: fixed;
             top: 0; left: 0; width: 100vw; height: 100vh;
@@ -507,7 +501,6 @@
             user-select: text;
         }
 
-        /* شريط الأدوات السفلي */
         .bottom-toolbar {
             position: fixed;
             bottom: 20px;
@@ -527,7 +520,6 @@
             transition: all 0.3s ease;
         }
 
-        /* زر العودة الذكي المخصص للوضع السينمائي والصورة الصافية */
         .exit-cinematic-btn {
             position: fixed;
             top: 16px;
@@ -553,7 +545,6 @@
             box-shadow: 0 0 25px var(--cyan);
         }
 
-        /* الوضع السينمائي لإصدار صورة صافية كلياً */
         body.cinematic-mode .header-hud,
         body.cinematic-mode .bottom-toolbar,
         body.cinematic-mode .node,
@@ -581,10 +572,8 @@
 </head>
 <body>
 
-    <!-- شعار OUTLAW RP النيون الضخم المضيء في خلفية الصفحة -->
     <img src="https://i.ibb.co/6y4G1vX/banner.png" class="outlaw-center-banner" alt="Outlaw RP Banner" id="outlawBannerImg" onerror="this.src='https://raw.githubusercontent.com/tobi/fivem-docs/main/banner.png';">
 
-    <!-- زر الاستعادة العائم المخصص للوضع السينمائي الصافي -->
     <button class="exit-cinematic-btn" id="exitCinematicBtn" onclick="toggleCinematicMode()">
         <i class="fa-solid fa-eye"></i> إظهار الواجهة
     </button>
@@ -622,7 +611,6 @@
         </div>
     </div>
 
-    <!-- نافذة المعاينة المكبرة للصور -->
     <div class="lightbox-modal" id="lightboxModal" onclick="closeLightbox()">
         <i class="fa-solid fa-xmark lightbox-close"></i>
         <img id="lightboxImg" src="" alt="معاينة الدليل المكبر">
@@ -653,7 +641,7 @@
     <script>
         const syncChannel = new BroadcastChannel('tactical_ops_sync');
         let db;
-        const request = indexedDB.open("TacticalOpsDB", 2);
+        const request = indexedDB.open("TacticalOpsDB", 3); // إستخدام الإصدار المحدث لمنع التضخم
         
         request.onupgradeneeded = function(e) {
             db = e.target.result;
@@ -672,6 +660,7 @@
         let cards = [], connections = [];
         let activeNodeData = null;
         let currentTargetCardId = null;
+        let objectUrlMap = {}; // خريطة ذكية لتنظيف وتفريغ الذاكرة فوراً لمنع التضخم
 
         const viewport = document.getElementById('viewport');
         const canvas = document.getElementById('canvas');
@@ -893,6 +882,7 @@
             };
         }
 
+        // تحسين الذاكرة بتعقب وإلغاء الروابط المؤقتة المفتوحة (Stream Revoke)
         function loadMediaFromDB(cardId) {
             if (!db) return;
             const tx = db.transaction("mediaStore", "readonly");
@@ -902,7 +892,15 @@
                 const container = document.getElementById(`media_container_${cardId}`);
                 if (req.result && container) {
                     const mediaBlob = req.result;
+
+                    // مسح الرابط القديم من الذاكرة إذا كان موجوداً لمنع تضخم 3.2 GB
+                    if (objectUrlMap[cardId]) {
+                        URL.revokeObjectURL(objectUrlMap[cardId]);
+                    }
+
                     const mediaUrl = typeof mediaBlob === 'string' ? mediaBlob : URL.createObjectURL(mediaBlob);
+                    objectUrlMap[cardId] = mediaUrl;
+
                     const isVideo = (mediaBlob.type && mediaBlob.type.startsWith('video')) || (typeof mediaBlob === 'string' && mediaBlob.startsWith('data:video'));
 
                     if (isVideo) {
@@ -1023,6 +1021,12 @@
             cards = cards.filter(c => c.id !== id);
             connections = connections.filter(cn => cn.from !== id && cn.to !== id);
             document.getElementById(id)?.remove();
+            
+            if (objectUrlMap[id]) {
+                URL.revokeObjectURL(objectUrlMap[id]);
+                delete objectUrlMap[id];
+            }
+
             if (db) {
                 const tx = db.transaction("mediaStore", "readwrite");
                 tx.objectStore("mediaStore").delete(id);
@@ -1036,6 +1040,12 @@
                 cards = [];
                 connections = [];
                 document.querySelectorAll('.card').forEach(el => el.remove());
+
+                Object.keys(objectUrlMap).forEach(k => {
+                    URL.revokeObjectURL(objectUrlMap[k]);
+                });
+                objectUrlMap = {};
+
                 if (db) {
                     const tx = db.transaction("mediaStore", "readwrite");
                     tx.objectStore("mediaStore").clear();
