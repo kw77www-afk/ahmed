@@ -9,15 +9,15 @@
     <style>
         :root {
             --bg-dark: #020509;
-            --panel-bg: rgba(5, 12, 22, 0.92);
+            --panel-bg: rgba(5, 12, 22, 0.95);
             --border-cyan: #00f0ff;
             --cyan: #00f0ff;
             --cyan-glow: rgba(0, 240, 255, 0.35);
             --gold: #ffb700;
             --red: #ff3366;
             --green: #00ff88;
-            --text-main: #f1f5f9;
-            --text-muted: #8ba0b5;
+            --text-main: #ffffff;
+            --text-muted: #a3b8cc;
         }
 
         * {
@@ -284,12 +284,13 @@
         .card-title-input {
             background: transparent;
             border: none;
-            color: #fff;
+            color: #ffffff;
             font-weight: 900;
-            font-size: 14px;
+            font-size: 15px;
             width: 70%;
             outline: none;
             user-select: text;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.9);
         }
 
         .card-type-tag {
@@ -298,9 +299,9 @@
             padding: 4px 10px;
             border-radius: 6px;
             text-transform: uppercase;
-            background: rgba(0, 240, 255, 0.15);
+            background: rgba(0, 240, 255, 0.2);
             color: var(--cyan);
-            border: 1px solid rgba(0, 240, 255, 0.3);
+            border: 1px solid rgba(0, 240, 255, 0.4);
         }
 
         .card-body {
@@ -311,29 +312,38 @@
             overflow: hidden;
         }
 
+        /* تعديل جوهري لضمان وضوح النصوص تماماً في جميع البطاقات بدون تداخل */
         .card-textarea {
             width: 100%;
             height: 110px;
-            background: rgba(0, 0, 0, 0.65);
-            border: 1px solid rgba(0, 240, 255, 0.25);
+            background: rgba(2, 6, 12, 0.92) !important;
+            border: 1.5px solid rgba(0, 240, 255, 0.4) !important;
             border-radius: 8px;
             padding: 10px;
-            color: var(--text-main);
-            font-size: 13px;
-            line-height: 1.6;
+            color: #ffffff !important;
+            font-size: 15px !important;
+            font-weight: 700 !important;
+            line-height: 1.7 !important;
             resize: vertical;
             outline: none;
             user-select: text;
             word-break: break-word;
+            box-shadow: inset 0 2px 6px rgba(0,0,0,0.8);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.9);
+        }
+
+        .card-textarea::placeholder {
+            color: var(--text-muted);
+            opacity: 0.8;
         }
 
         .card-textarea:focus {
-            border-color: var(--cyan);
-            box-shadow: 0 0 12px rgba(0, 240, 255, 0.3);
+            border-color: var(--cyan) !important;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.4), inset 0 2px 6px rgba(0,0,0,0.8);
         }
 
         .card-report-only {
-            background: linear-gradient(135deg, rgba(0, 240, 255, 0.12) 0%, rgba(3, 8, 16, 0.98) 100%);
+            background: linear-gradient(135deg, rgba(0, 240, 255, 0.15) 0%, rgba(3, 8, 16, 0.98) 100%);
             border: 2px solid var(--gold) !important;
             box-shadow: 0 0 35px rgba(255, 183, 0, 0.3) !important;
         }
@@ -345,7 +355,7 @@
         }
 
         .card-report-only .card-type-tag {
-            background: rgba(255, 183, 0, 0.2) !important;
+            background: rgba(255, 183, 0, 0.25) !important;
             color: var(--gold) !important;
             border-color: var(--gold) !important;
         }
@@ -358,10 +368,10 @@
             font-weight: 700 !important;
             line-height: 1.9 !important;
             color: #ffffff !important;
-            background: rgba(0, 0, 0, 0.75) !important;
-            border: 1px solid rgba(255, 183, 0, 0.4) !important;
+            background: rgba(0, 0, 0, 0.9) !important;
+            border: 1.5px solid rgba(255, 183, 0, 0.5) !important;
             padding: 14px !important;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+            text-shadow: 0 1px 3px rgba(0,0,0,0.9);
         }
 
         .media-container {
@@ -641,7 +651,7 @@
     <script>
         const syncChannel = new BroadcastChannel('tactical_ops_sync');
         let db;
-        const request = indexedDB.open("TacticalOpsDB", 3); // إستخدام الإصدار المحدث لمنع التضخم
+        const request = indexedDB.open("TacticalOpsDB", 3);
         
         request.onupgradeneeded = function(e) {
             db = e.target.result;
@@ -660,7 +670,7 @@
         let cards = [], connections = [];
         let activeNodeData = null;
         let currentTargetCardId = null;
-        let objectUrlMap = {}; // خريطة ذكية لتنظيف وتفريغ الذاكرة فوراً لمنع التضخم
+        let objectUrlMap = {};
 
         const viewport = document.getElementById('viewport');
         const canvas = document.getElementById('canvas');
@@ -882,7 +892,6 @@
             };
         }
 
-        // تحسين الذاكرة بتعقب وإلغاء الروابط المؤقتة المفتوحة (Stream Revoke)
         function loadMediaFromDB(cardId) {
             if (!db) return;
             const tx = db.transaction("mediaStore", "readonly");
@@ -893,7 +902,6 @@
                 if (req.result && container) {
                     const mediaBlob = req.result;
 
-                    // مسح الرابط القديم من الذاكرة إذا كان موجوداً لمنع تضخم 3.2 GB
                     if (objectUrlMap[cardId]) {
                         URL.revokeObjectURL(objectUrlMap[cardId]);
                     }
